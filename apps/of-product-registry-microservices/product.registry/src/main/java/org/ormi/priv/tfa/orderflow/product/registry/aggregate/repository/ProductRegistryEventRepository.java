@@ -10,6 +10,9 @@ import org.ormi.priv.tfa.orderflow.product.registry.aggregate.repository.model.P
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Sort;
 
+/**
+ * Implémentation de l'interface {@link EventStore} pour les événements de registre de produit.
+ */
 @ApplicationScoped
 public class ProductRegistryEventRepository
     implements EventStore<ProductRegistryEventEntity>,

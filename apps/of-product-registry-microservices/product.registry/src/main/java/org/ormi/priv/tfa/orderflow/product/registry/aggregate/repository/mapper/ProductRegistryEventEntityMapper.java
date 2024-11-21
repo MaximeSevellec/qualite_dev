@@ -11,6 +11,9 @@ import org.ormi.priv.tfa.orderflow.product.registry.aggregate.repository.model.P
 import org.ormi.priv.tfa.orderflow.product.registry.aggregate.repository.model.ProductRemovedEventEntity;
 import org.ormi.priv.tfa.orderflow.product.registry.aggregate.repository.model.ProductUpdatedEventEntity;
 
+/**
+ * Mapper pour les événements de registre de produit.
+ */
 @Mapper(uses = {EventIdMapper.class, ProductRegistryEventPayloadMapper.class})
 public interface ProductRegistryEventEntityMapper {
 
