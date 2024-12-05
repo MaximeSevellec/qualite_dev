@@ -12,13 +12,19 @@ import org.ormi.priv.tfa.orderflow.product.registry.aggregate.repository.model.P
 import org.ormi.priv.tfa.orderflow.product.registry.aggregate.repository.model.ProductUpdatedEventEntity;
 
 /**
- * Mapper pour les événements de registre de produit.
+ * Transforme les événements de registre de produit en entités, fais aussi l'inverse
  */
 @Mapper(uses = {EventIdMapper.class, ProductRegistryEventPayloadMapper.class})
 public interface ProductRegistryEventEntityMapper {
 
   ProductRegistryEventEntityMapper INSTANCE = Mappers.getMapper(ProductRegistryEventEntityMapper.class);
 
+  /**
+   * Transforme un événement de produit enregistré en entité
+   * 
+   * @param evt l'événement de produit
+   * @return l'entité de l'événement de produit
+   */
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "eventId", source = "id", qualifiedByName = "eventIdToString")
   @Mapping(target = "eventType", source = "eventType")
@@ -28,6 +34,12 @@ public interface ProductRegistryEventEntityMapper {
   @Mapping(target = "payload", source = "payload", qualifiedByName = "productRegisteredEventPayloadToEntity")
   ProductRegisteredEventEntity toEntity(ProductRegistered evt);
 
+  /**
+   * Transforme une entité d'événement de produit enregistré en événement de produit
+   * 
+   * @param entity l'entité d'événement de produit
+   * @return l'événement de produit
+   */
   @Mapping(target = "id", source = "eventId", qualifiedByName = "toEventId")
   @Mapping(target = "eventType", ignore = true)
   @Mapping(target = "aggregateId", source = "aggregateRootId")
@@ -36,6 +48,12 @@ public interface ProductRegistryEventEntityMapper {
   @Mapping(target = "payload", source = "payload", qualifiedByName = "productRegisteredEventPayloadToEvent")
   ProductRegistered toEvent(ProductRegisteredEventEntity entity);
 
+  /**
+   * Transforme un événement de produit mis à jour en entité
+   * 
+   * @param evt l'événement de produit mis à jour
+   * @return l'entité de l'événement de produit mis à jour
+   */
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "eventId", source = "id", qualifiedByName = "eventIdToString")
   @Mapping(target = "eventType", source = "eventType")
@@ -45,6 +63,12 @@ public interface ProductRegistryEventEntityMapper {
   @Mapping(target = "payload", source = "payload", qualifiedByName = "productUpdatedEventEntityToEntity")
   ProductUpdatedEventEntity toEntity(ProductUpdated evt);
 
+  /**
+   * Transforme une entité d'événement de produit mis à jour en événement de produit mis à jour
+   * 
+   * @param entity l'entité d'événement de produit mis à jour
+   * @return l'événement de produit mis à jour
+   */
   @Mapping(target = "id", source = "eventId", qualifiedByName = "toEventId")
   @Mapping(target = "eventType", ignore = true)
   @Mapping(target = "aggregateId", source = "aggregateRootId")
@@ -53,6 +77,12 @@ public interface ProductRegistryEventEntityMapper {
   @Mapping(target = "payload", source = "payload", qualifiedByName = "productUpdatedEventPayloadToEvent")
   ProductUpdated toEvent(ProductUpdatedEventEntity entity);
 
+  /**
+   * Transforme un événement de produit supprimé en entité
+   * 
+   * @param evt l'événement de produit supprimé
+   * @return l'entité de l'événement de produit supprimé
+   */
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "eventId", source = "id", qualifiedByName = "eventIdToString")
   @Mapping(target = "eventType", source = "eventType")
@@ -62,6 +92,12 @@ public interface ProductRegistryEventEntityMapper {
   @Mapping(target = "payload", source = "payload", qualifiedByName = "productRemovedEventPayloadToEntity")
   ProductRemovedEventEntity toEntity(ProductRemoved evt);
 
+  /**
+   * Transforme une entité d'événement de produit supprimé en événement de produit supprimé
+   * 
+   * @param entity l'entité d'événement de produit supprimé
+   * @return l'événement de produit supprimé
+   */
   @Mapping(target = "id", source = "eventId", qualifiedByName = "toEventId")
   @Mapping(target = "eventType", ignore = true)
   @Mapping(target = "aggregateId", source = "aggregateRootId")
