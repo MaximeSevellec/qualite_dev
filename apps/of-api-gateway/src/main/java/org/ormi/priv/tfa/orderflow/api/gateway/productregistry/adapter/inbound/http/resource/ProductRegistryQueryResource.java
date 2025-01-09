@@ -31,6 +31,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import org.ormi.priv.tfa.orderflow.api.gateway.productregistry.adapter.inbound.http.resource.exception.ProductRegistryConsumerbyCorrelationException;
+
 /**
  * The product registry query resource.
  * 
@@ -171,7 +173,7 @@ public class ProductRegistryQueryResource {
           .subscriptionName(topic)
           .subscribe();
     } catch (PulsarClientException e) {
-      throw new RuntimeException("Failed to create consumer for correlationId: " + correlationId, e);
+      throw new ProductRegistryConsumerbyCorrelationException("Failed to create consumer for correlationId: " + correlationId, e);
     }
   }
 }
