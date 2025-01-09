@@ -4,19 +4,23 @@ public class ProductRemovedEventEntity extends ProductRegistryEventEntity {
   static final String EVENT_TYPE = "ProductRemoved";
 
   /**
-   * Payload for the event.
+   * Record class for the payload.
    */
-  public static class Payload {
-    /**
-     * The id of the product.
-     */
-    public String productId;
+  public record Payload (String productId) {  
   }
 
   /**
    * The payload for the event.
    */
-  public Payload payload;
+  private Payload payload;
+
+  public Payload getPayload() {
+    return payload;
+  }
+
+  public void setPayload(Payload payload) {
+    this.payload = payload;
+  }
 
   @Override
   public String getEventType() {

@@ -4,27 +4,23 @@ public class ProductUpdatedEventEntity extends ProductRegistryEventEntity {
   static final String EVENT_TYPE = "ProductUpdated";
 
   /**
-   * Payload for the event.
+   * Record class for the payload.
    */
-  public static class Payload {
-    /**
-     * The id of the product.
-     */
-    public String productId;
-    /**
-     * The name of the product.
-     */
-    public String name;
-    /**
-     * The description of the product.
-     */
-    public String productDescription;
+  public record Payload (String productId,String name,String productDescription) {
   }
 
   /**
    * The payload for the event.
    */
-  public Payload payload;
+  private Payload payload;
+
+  public Payload getPayload() {
+    return payload;
+  }
+
+  public void setPayload(Payload payload) {
+    this.payload = payload;
+  }
 
 
   @Override
