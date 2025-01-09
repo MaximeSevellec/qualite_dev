@@ -48,6 +48,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
+import org.ormi.priv.tfa.orderflow.api.gateway.productregistry.adapter.inbound.http.resource.exception.ProductRegistryConsumerCreationException;
+
 @Path("/product/registry")
 public class ProductRegistryCommandResource {
 
@@ -335,7 +337,7 @@ public class ProductRegistryCommandResource {
           .topic(topic)
           .subscribe();
     } catch (PulsarClientException e) {
-      throw new RuntimeException("Failed to create consumer for product registry events.", e);
+      throw new ProductRegistryConsumerCreationException("Failed to create consumer for product registry events.", e);
     }
   }
 }
