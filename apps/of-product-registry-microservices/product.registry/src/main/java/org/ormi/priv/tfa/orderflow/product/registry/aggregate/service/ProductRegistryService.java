@@ -32,17 +32,14 @@ import jakarta.transaction.Transactional;
 public class ProductRegistryService {
   private static final String PRODUCT_REGISTRY_ID = "GLOBAL_REGISTRY";
 
-  /**
-   * Product registry repository to interact with the persistance layer.
-   */
-  @Inject
-  private ProductRegistryEventRepository productRegistryRepository;
+  private final ProductRegistryEventRepository productRegistryRepository;
+  private final ProductRegistryEventEmitter eventEmitter;
 
-  /**
-   * Product registry projector to project events to the read model.
-   */
   @Inject
-  private ProductRegistryEventEmitter eventEmitter;
+  public ProductRegistryService(ProductRegistryEventRepository productRegistryRepository, ProductRegistryEventEmitter eventEmitter) {
+    this.productRegistryRepository = productRegistryRepository;
+    this.eventEmitter = eventEmitter;
+  }
 
   /**
    * Load the product registry from the event store.
@@ -82,7 +79,6 @@ public class ProductRegistryService {
   public Uni<ProductRegistered> registerProduct(ProductRegistry registry, RegisterProduct registerProduct) {
     Log.debug("Registering product: " + registerProduct);
     // Check if the product name is available
-    // TODO: Inverse the check to simplify the code
     if (registry.isProductNameAvailable(registerProduct.getName())) {
       // Create and save the event
       final ProductRegistered evt = new ProductRegistered(

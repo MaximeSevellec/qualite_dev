@@ -33,8 +33,12 @@ public class ProductRegistryEventEmitter {
   /**
    * The Pulsar client service.
    */
+  private final PulsarClientService pulsarClients;
+
   @Inject
-  private PulsarClientService pulsarClients;
+  public ProductRegistryEventEmitter(PulsarClientService pulsarClients) {
+    this.pulsarClients = pulsarClients;
+  }
 
   /**
    * Event emitter to send events to the read model.
@@ -94,7 +98,7 @@ public class ProductRegistryEventEmitter {
   public void sink(String correlationId, ProductRegistryEvent event) {
     // Get the producer for the correlation id
     getEventSinkByCorrelationId(correlationId)
-        .thenAccept((producer) -> {
+        .thenAccept(producer -> 
           // Sink the event
           producer
               .newMessage()
@@ -110,8 +114,8 @@ public class ProductRegistryEventEmitter {
                 } catch (PulsarClientException e) {
                   throw new ProductRegistryProducerCloseException("Failed to close producer", e);
                 }
-              });
-        });
+              })
+        );
   }
 
   /**

@@ -44,14 +44,24 @@ public class ProductRegistryQueryResource {
   /**
    * The Pulsar client service.
    */
-  @Inject
-  PulsarClientService pulsarClients;
+  private final PulsarClientService pulsarClients;
 
   /**
    * The query emitter. Used to send queries to the product registry.
    */
-  @Channel("product-registry-query")
-  Emitter<ProductRegistryQuery> queryEmitter;
+  private final Emitter<ProductRegistryQuery> queryEmitter;
+
+  /**
+   * Constructor for ProductRegistryQueryResource.
+   * 
+   * @param pulsarClients - the Pulsar client service
+   * @param queryEmitter - the query emitter
+   */
+  @Inject
+  public ProductRegistryQueryResource(PulsarClientService pulsarClients, @Channel("product-registry-query") Emitter<ProductRegistryQuery> queryEmitter) {
+    this.pulsarClients = pulsarClients;
+    this.queryEmitter = queryEmitter;
+  }
 
   /**
    * Get the product by id.

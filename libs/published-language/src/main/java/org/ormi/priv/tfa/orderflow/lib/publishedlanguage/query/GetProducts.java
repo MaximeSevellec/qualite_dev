@@ -27,5 +27,6 @@ public final class GetProducts implements ProductRegistryQuery {
    * Create a new instance of the query.
    */
   public GetProducts() {
+    //
   }
 }

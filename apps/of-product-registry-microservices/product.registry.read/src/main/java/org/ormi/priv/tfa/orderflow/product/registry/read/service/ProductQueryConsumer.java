@@ -3,7 +3,6 @@ package org.ormi.priv.tfa.orderflow.product.registry.read.service;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.stream.Collectors;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
@@ -33,14 +32,14 @@ public class ProductQueryConsumer {
   /**
    * The product service.
    */
-  @Inject
-  private ProductService productService;
+  private final ProductService productService;
+  private final ProductQueryResultEmitter resultEmitter;
 
-  /**
-   * Query result emitter.
-   */
   @Inject
-  private ProductQueryResultEmitter resultEmitter;
+  public ProductQueryConsumer(ProductService productService, ProductQueryResultEmitter resultEmitter) {
+    this.productService = productService;
+    this.resultEmitter = resultEmitter;
+  }
 
   /**
    * Handle product queries.
@@ -57,8 +56,7 @@ public class ProductQueryConsumer {
     final ProductRegistryQuery qry = msg.getPayload();
 
     return Uni.createFrom().deferred(() -> {
-      if (qry instanceof GetProductById) {
-        GetProductById getProductById = (GetProductById) qry;
+      if (qry instanceof GetProductById getProductById) {
         return getProductById(getProductById.getProductId());
       } else if (qry instanceof GetProducts) {
         return getAllProducts();
@@ -105,7 +103,7 @@ public class ProductQueryConsumer {
               .getAllProducts()
               .stream()
               .map(RegistryProductDtoMapper.INSTANCE::toRegistryProductDto)
-              .collect(Collectors.toList()));
+              .toList());
     });
   }
 }

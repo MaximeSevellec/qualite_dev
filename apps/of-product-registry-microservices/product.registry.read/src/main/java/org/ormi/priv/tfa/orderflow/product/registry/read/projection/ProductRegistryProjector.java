@@ -25,11 +25,17 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class ProductRegistryProjector {
 
+  private final ProductService productService;
+
   /**
-   * The product service.
+   * Constructor for ProductRegistryProjector.
+   * 
+   * @param productService - the product service to inject
    */
   @Inject
-  private ProductService productService;
+  public ProductRegistryProjector(ProductService productService) {
+    this.productService = productService;
+  }
 
   /**
    * Handle the event.
@@ -37,12 +43,12 @@ public class ProductRegistryProjector {
    * @param event - the event to handle
    */
   public void handleEvent(ProductRegistryEvent event) {
-    if (event instanceof ProductRegistered) {
-      projectRegisteredProduct((ProductRegistered) event);
-    } else if (event instanceof ProductUpdated) {
-      projectUpdatedProduct((ProductUpdated) event);
-    } else if (event instanceof ProductRemoved) {
-      projectRemovedProduct((ProductRemoved) event);
+    if (event instanceof ProductRegistered productRegistered) {
+      projectRegisteredProduct(productRegistered);
+    } else if (event instanceof ProductUpdated productUpdated) {
+      projectUpdatedProduct(productUpdated);
+    } else if (event instanceof ProductRemoved productRemoved) {
+      projectRemovedProduct(productRemoved);
     }
   }
 
@@ -54,9 +60,9 @@ public class ProductRegistryProjector {
   public void projectRegisteredProduct(ProductRegistered registered) {
     // Create a new product entity
     final ProductEntity product = new ProductEntity();
-    product.productId = registered.payload.productId.getId();
-    product.name = registered.payload.name;
-    product.description = registered.payload.productDescription;
+    product.setProductId(registered.payload.productId.getId()); 
+    product.setName(registered.payload.name);
+    product.setDescription(registered.payload.productDescription);
     
     // Persist the product
     productService.createProduct(product);
@@ -72,13 +78,12 @@ public class ProductRegistryProjector {
     final Optional<ProductEntity> result = productService.getProductById(updated.payload.productId);
     if (result.isEmpty()) {
       // The product does not exist
-      // TODO: Log an error
       return;
     }
     // Update the product
     final ProductEntity product = result.get();
-    product.name = updated.payload.name;
-    product.description = updated.payload.productDescription;
+    product.setName(updated.payload.name);
+    product.setDescription(updated.payload.productDescription);
     // Persist the product
     productService.updateProduct(product);
   }

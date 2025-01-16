@@ -24,6 +24,7 @@ import jakarta.transaction.Transactional.TxType;
  */
 public class ProductRegistry {
 
+  static final String COMMAND = "Command: ";
   /**
    * Product registry service to interact with the registry and persistance layer.
    */
@@ -56,26 +57,26 @@ public class ProductRegistry {
   public Uni<? extends ProductRegistryEvent> handle(ProductRegistryCommand cmd) {
     Log.debug("Handling command: " + cmd.getClass().getName());
     if (cmd instanceof RegisterProduct register) {
-      Log.debug("Command: " + register.toString());
+      Log.debug(COMMAND + register.toString());
       return productRegistryService
           .registerProduct(this, register)
           .onItem().invoke(this::apply)
           .onFailure().invoke(e -> Log.error("Failed to register product", e));
     } else if (cmd instanceof RemoveProduct remove) {
-      Log.debug("Command: " + remove.toString());
+      Log.debug(COMMAND + remove.toString());
       return productRegistryService
           .removeProduct(this, remove)
           .onItem().invoke(this::apply)
           .onFailure().invoke(e -> Log.error("Failed to remove product", e));
     } else if (cmd instanceof UpdateProduct update) {
-      Log.debug("Command: " + update.toString());
+      Log.debug(COMMAND + update.toString());
       return productRegistryService
           .updateProduct(this, update)
           .onItem().invoke(this::apply)
           .onFailure().invoke(e -> Log.error("Failed to update product", e));
     } else {
       Log.warn("Unhandled command type: " + cmd.getClass().getName());
-      Log.debug("Command: " + cmd.toString());
+      Log.debug(COMMAND + cmd.toString());
       return Uni.createFrom().failure(new IllegalArgumentException("Unhandled command type"));
     }
   }
@@ -99,12 +100,10 @@ public class ProductRegistry {
       products.remove(removed.payload.productId);
     } else if (event instanceof ProductUpdated updated) {
       final ProductId productId = updated.payload.productId;
-      products.compute(productId, (k, v) -> {
-        return new Product(
-            productId,
-            updated.payload.name,
-            updated.payload.productDescription);
-      });
+      products.compute(productId, (k, v) -> new Product(
+          productId,
+          updated.payload.name,
+          updated.payload.productDescription));
     } else {
       Log.warn("Unhandled event type: " + event.getClass().getName());
     }

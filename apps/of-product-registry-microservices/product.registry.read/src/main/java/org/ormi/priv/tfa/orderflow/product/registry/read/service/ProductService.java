@@ -21,8 +21,12 @@ public class ProductService {
   /**
    * The product repository.
    */
+  private final ProductRepository productRepository;
+
   @Inject
-  private ProductRepository productRepository;
+  public ProductService(ProductRepository productRepository) {
+    this.productRepository = productRepository;
+  }
 
   /**
    * Persist a new product.

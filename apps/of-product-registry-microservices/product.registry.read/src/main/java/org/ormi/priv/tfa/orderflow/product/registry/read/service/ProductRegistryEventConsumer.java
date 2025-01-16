@@ -11,14 +11,17 @@ import jakarta.transaction.Transactional;
 @ApplicationScoped
 public class ProductRegistryEventConsumer {
 
+  private final ProductRegistryProjector projector;
+
   @Inject
-  private ProductRegistryProjector projector;
+  public ProductRegistryEventConsumer(ProductRegistryProjector projector) {
+    this.projector = projector;
+  }
 
   @Incoming("product-registry-event")
   @Transactional(Transactional.TxType.REQUIRED)
   public void handleEvent(ProductRegistryEvent event) {
     // Project the event
     projector.handleEvent(event);
-    // TODO: Sink the event here once or while projection is processed
   }
 }

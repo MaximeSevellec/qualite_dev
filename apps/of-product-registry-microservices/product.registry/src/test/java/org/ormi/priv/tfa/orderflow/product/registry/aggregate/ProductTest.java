@@ -2,6 +2,8 @@ package org.ormi.priv.tfa.orderflow.product.registry.aggregate;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,10 +12,10 @@ import org.ormi.priv.tfa.orderflow.lib.publishedlanguage.valueobject.ProductId;
 public class ProductTest {
 
   @Nested
-  public class Equals {
+  class Equals {
 
     @Test
-    public void it_should_returnTrue_when_comparingProductsWithSameId() {
+    void it_should_returnTrue_when_comparingProductsWithSameId() {
       // Given
       ProductId productId = new ProductId();
       Product product1 = new Product(productId, "Test 1", "A test product");
@@ -27,7 +29,7 @@ public class ProductTest {
     }
 
     @Test
-    public void it_should_returnFalse_when_comparingProductsWithDifferentId() {
+    void it_should_returnFalse_when_comparingProductsWithDifferentId() {
       // Given
       ProductId productId1 = new ProductId();
       ProductId productId2 = new ProductId();
@@ -43,10 +45,10 @@ public class ProductTest {
   }
 
   @Nested
-  public class HashCode {
+  class HashCode {
 
     @Test
-    public void it_should_returnSameHashCode_when_comparingProductsWithSameId() {
+    void it_should_returnSameHashCode_when_comparingProductsWithSameId() {
       // Given
       ProductId productId = new ProductId();
       Product product1 = new Product(productId, "Test 1", "A test product");
@@ -57,11 +59,11 @@ public class ProductTest {
       int hashCode2 = product2.hashCode();
 
       // Then
-      assertTrue(hashCode1 == hashCode2);
+      assertEquals(hashCode1, hashCode2);
     }
 
     @Test
-    public void it_should_returnDifferentHashCode_when_comparingProductsWithDifferentId() {
+    void it_should_returnDifferentHashCode_when_comparingProductsWithDifferentId() {
       // Given
       ProductId productId1 = new ProductId();
       ProductId productId2 = new ProductId();
@@ -73,15 +75,15 @@ public class ProductTest {
       int hashCode2 = product2.hashCode();
 
       // Then
-      assertFalse(hashCode1 == hashCode2);
+      assertNotEquals(hashCode1, hashCode2);
     }
   }
 
   @Nested
-  public class ToString {
+  class ToString {
 
     @Test
-    public void it_should_returnStringRepresentationOfProduct() {
+    void it_should_returnStringRepresentationOfProduct() {
       // Given
       ProductId productId = new ProductId();
       Product product = new Product(productId, "Test 1", "A test product");

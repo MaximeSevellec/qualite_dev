@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.ormi.priv.tfa.orderflow.api.gateway.productregistry.adapter.inbound.http.dto.RegisterProductCommandDto;
 import org.ormi.priv.tfa.orderflow.lib.publishedlanguage.command.RegisterProduct;
 
-public class RegisterProductCommandDtoMapperTest {
+class RegisterProductCommandDtoMapperTest {
 
   @Test
-  public void toCommand_shouldMap_dto_toCommand() {
+  void toCommand_shouldMap_dto_toCommand() {
     // Given
     final String name = "product1";
     final String description = "this is a product";

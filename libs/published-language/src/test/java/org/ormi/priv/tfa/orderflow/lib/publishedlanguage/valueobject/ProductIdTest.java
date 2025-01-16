@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Test;
 public class ProductIdTest {
 
   @Nested
-  public class Equals {
+  class Equals {
 
     @Test
-    public void it_should_returnTrue_when_comparingIdsOfTheSameValue() {
+    void it_should_returnTrue_when_comparingIdsOfTheSameValue() {
       // Given
       String id = UUID.randomUUID().toString();
       ProductId productId = ProductId.of(id);
@@ -29,7 +29,7 @@ public class ProductIdTest {
     }
 
     @Test
-    public void it_should_returnFalse_when_comparingIdsOfDifferentValues() {
+    void it_should_returnFalse_when_comparingIdsOfDifferentValues() {
       // Given
       ProductId productId = new ProductId();
       ProductId otherProductId = new ProductId();
@@ -43,10 +43,10 @@ public class ProductIdTest {
   }
 
   @Nested
-  public class HashCode {
+  class HashCode {
 
     @Test
-    public void it_should_returnSameHashCode_when_comparingIdsOfTheSameValue() {
+    void it_should_returnSameHashCode_when_comparingIdsOfTheSameValue() {
       // Given
       String id = UUID.randomUUID().toString();
       ProductId productId = ProductId.of(id);
@@ -61,7 +61,7 @@ public class ProductIdTest {
     }
 
     @Test
-    public void it_should_returnDifferentHashCode_when_comparingIdsOfDifferentValues() {
+    void it_should_returnDifferentHashCode_when_comparingIdsOfDifferentValues() {
       // Given
       ProductId productId = new ProductId();
       ProductId otherProductId = new ProductId();
@@ -76,10 +76,10 @@ public class ProductIdTest {
   }
 
   @Nested
-  public class ToString {
+  class ToString {
 
     @Test
-    public void it_should_returnStringRepresentationOfProductId() {
+    void it_should_returnStringRepresentationOfProductId() {
       // Given
       String id = UUID.randomUUID().toString();
       ProductId productId = ProductId.of(id);

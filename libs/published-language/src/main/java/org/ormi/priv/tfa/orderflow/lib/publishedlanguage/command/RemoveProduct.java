@@ -42,4 +42,6 @@ public final class RemoveProduct implements ProductRegistryCommand {
   public String toString() {
     return String.format("%s{productId=%s}", this.getClass().getSimpleName(), productId);
   }
+
+
 }

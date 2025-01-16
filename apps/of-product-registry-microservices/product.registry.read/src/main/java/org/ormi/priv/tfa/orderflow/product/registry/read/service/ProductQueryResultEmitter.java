@@ -13,17 +13,23 @@ import io.smallrye.reactive.messaging.pulsar.PulsarClientService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import org.ormi.priv.tfa.orderflow.product.registry.read.service.exception.ProductQueryResultEmitterException;
+
 @ApplicationScoped
 public class ProductQueryResultEmitter {
 
+  private final PulsarClientService pulsarClients;
+
   @Inject
-  private PulsarClientService pulsarClients;
+  public ProductQueryResultEmitter(PulsarClientService pulsarClients) {
+    this.pulsarClients = pulsarClients;
+  }
 
   public void sink(String correlationId, ProductRegistryQueryResult result) {
     // Get the producer for the correlation id
     getResultProducerByCorrelationId(correlationId,
         ProductRegistryQueryResult.class)
-        .thenAccept((producer) -> {
+        .thenAccept(producer -> 
           // Sink the result
           producer
               .newMessage()
@@ -31,17 +37,17 @@ public class ProductQueryResultEmitter {
               .sendAsync()
               .whenComplete((msgId, ex) -> {
                 if (ex != null) {
-                  throw new RuntimeException("Failed to send message", ex);
+                  throw new ProductQueryResultEmitterException("Failed to send message", ex);
                 }
                 Log.debug(String.format("Sinked result with correlation id{%s}", correlationId));
                 try {
                   producer.flush();
                   producer.close();
                 } catch (PulsarClientException e) {
-                  throw new RuntimeException("Failed to close producer", e);
+                  throw new ProductQueryResultEmitterException("Failed to close producer", e);
                 }
-              });
-        });
+              })
+        );
   }
 
   /**
@@ -64,7 +70,7 @@ public class ProductQueryResultEmitter {
         .createAsync()
         .exceptionally(
             ex -> {
-              throw new RuntimeException("Failed to create producer for correlation id: " + correlationId, ex);
+              throw new ProductQueryResultEmitterException("Failed to create producer for correlation id: " + correlationId, ex);
             });
   }
 }

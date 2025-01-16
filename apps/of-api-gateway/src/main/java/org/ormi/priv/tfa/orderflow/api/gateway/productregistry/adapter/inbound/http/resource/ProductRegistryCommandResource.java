@@ -56,15 +56,20 @@ public class ProductRegistryCommandResource {
   /**
    * Pulsar client service for creating consumers and producers.
    */
-  @Inject
-  PulsarClientService pulsarClients;
+  private static final String CORRELATION_ID_KEY = "correlation-id";
+  private static final String FAILED_TO_CLOSE_CONSUMER_LOG = "Failed to close consumer for product registry events.";
+  private static final String[] NO_EVENT_RECEIVED_LOG = {"No event received within timeout of ", " seconds."};
+  private static final String RECEIVED_EVENT = "Received event: ";
+  private static final String UNEXEPECTED_EVENT_TYPE = "Unexpected event type: ";
+  private static final String FAILED_TO_RECEIVE_EVENT = "Failed to receive event from consumer.";
+  private final PulsarClientService pulsarClients;
+  private final Emitter<ProductRegistryCommand> commandEmitter;
 
-  /**
-   * Static emitter for sending product registry commands.
-   */
   @Inject
-  @Channel("product-registry-command")
-  Emitter<ProductRegistryCommand> commandEmitter;
+  public ProductRegistryCommandResource(PulsarClientService pulsarClients, @Channel("product-registry-command") Emitter<ProductRegistryCommand> commandEmitter) {
+    this.pulsarClients = pulsarClients;
+    this.commandEmitter = commandEmitter;
+  }
 
   /**
    * Endpoint to register a product.
@@ -80,9 +85,10 @@ public class ProductRegistryCommandResource {
     final String correlationId = UUID.randomUUID().toString();
     commandEmitter.send(
         PulsarOutgoingMessage.from(Message.of(registerProduct))
-            .addMetadata(PulsarOutgoingMessageMetadata.builder()
-                .withProperties(Map.of("correlation-id", correlationId))
-                .build()));
+                .addMetadata(PulsarOutgoingMessageMetadata.builder()
+                    .withProperties(Map.of(CORRELATION_ID_KEY, correlationId))
+                    .build())
+                );
     return Response
         .seeOther(
             uriInfo.getBaseUriBuilder()
@@ -112,7 +118,7 @@ public class ProductRegistryCommandResource {
         try {
           consumer.unsubscribe();
         } catch (PulsarClientException e) {
-          Log.error("Failed to close consumer for product registry events.", e);
+          Log.error(FAILED_TO_CLOSE_CONSUMER_LOG, e);
         }
       });
       // Consume events and emit DTOs
@@ -123,11 +129,11 @@ public class ProductRegistryCommandResource {
             final var msg = Optional.ofNullable(consumer.receive(timeout, TimeUnit.MILLISECONDS));
             if (msg.isEmpty()) {
               // Complete the emitter if no event is received within the timeout. Free up resources.
-              Log.debug("No event received within timeout of " + timeout + " seconds.");
+              Log.debug(NO_EVENT_RECEIVED_LOG[0] + timeout + NO_EVENT_RECEIVED_LOG[1]);
               em.complete();
             }
             final ProductRegistryEvent evt = msg.get().getValue();
-            Log.debug("Received event: " + evt);
+            Log.debug(RECEIVED_EVENT + evt);
             // Map event to DTO
             if (evt instanceof ProductRegistered registered) {
               Log.debug("Emitting DTO for registered event: " + registered);
@@ -135,14 +141,14 @@ public class ProductRegistryCommandResource {
               em.emit(ProductRegistryEventDtoMapper.INSTANCE.toDto(registered));
             } else {
               // Fail the stream on unexpected event types
-              Throwable error = new ProductRegistryEventStreamException("Unexpected event type: " + evt.getClass().getName());
+              Throwable error = new ProductRegistryEventStreamException(UNEXEPECTED_EVENT_TYPE + evt.getClass().getName());
               em.fail(error);
               return;
             }
             // Acknowledge the message
             consumer.acknowledge(msg.get());
           } catch (PulsarClientException e) {
-            Log.error("Failed to receive event from consumer.", e);
+            Log.error(FAILED_TO_RECEIVE_EVENT, e);
             em.fail(e);
             return;
           }
@@ -167,7 +173,7 @@ public class ProductRegistryCommandResource {
     commandEmitter.send(
         PulsarOutgoingMessage.from(Message.of(updateProductCommand))
             .addMetadata(PulsarOutgoingMessageMetadata.builder()
-                .withProperties(Map.of("correlation-id", correlationId))
+                .withProperties(Map.of(CORRELATION_ID_KEY, correlationId))
                 .build()));
     return Response
         .seeOther(
@@ -197,7 +203,7 @@ public class ProductRegistryCommandResource {
         try {
           consumer.unsubscribe();
         } catch (PulsarClientException e) {
-          Log.error("Failed to close consumer for product registry events.", e);
+          Log.error(FAILED_TO_CLOSE_CONSUMER_LOG, e);
         }
       });
       // Consume events and emit DTOs
@@ -208,11 +214,11 @@ public class ProductRegistryCommandResource {
             final var msg = Optional.ofNullable(consumer.receive(timeout, TimeUnit.MILLISECONDS));
             if (msg.isEmpty()) {
               // Complete the emitter if no event is received within the timeout. Free up resources.
-              Log.debug("No event received within timeout of " + timeout + " seconds.");
+              Log.debug(NO_EVENT_RECEIVED_LOG[0] + timeout + NO_EVENT_RECEIVED_LOG[1]);
               em.complete();
             }
             final ProductRegistryEvent evt = msg.get().getValue();
-            Log.debug("Received event: " + evt);
+            Log.debug(RECEIVED_EVENT + evt);
             // Map event to DTO
             if (evt instanceof ProductUpdated updated) {
               Log.debug("Emitting DTO for updated event: " + updated);
@@ -220,14 +226,14 @@ public class ProductRegistryCommandResource {
               em.emit(ProductRegistryEventDtoMapper.INSTANCE.toDto(updated));
             } else {
               // Fail the stream on unexpected event types
-              Throwable error = new ProductRegistryEventStreamException("Unexpected event type: " + evt.getClass().getName());
+              Throwable error = new ProductRegistryEventStreamException(UNEXEPECTED_EVENT_TYPE + evt.getClass().getName());
               em.fail(error);
               return;
             }
             // Acknowledge the message
             consumer.acknowledge(msg.get());
           } catch (PulsarClientException e) {
-            Log.error("Failed to receive event from consumer.", e);
+            Log.error(FAILED_TO_RECEIVE_EVENT, e);
             em.fail(e);
             return;
           }
@@ -252,7 +258,7 @@ public class ProductRegistryCommandResource {
     commandEmitter.send(
         PulsarOutgoingMessage.from(Message.of(removeProductCommand))
             .addMetadata(PulsarOutgoingMessageMetadata.builder()
-                .withProperties(Map.of("correlation-id", correlationId))
+                .withProperties(Map.of(CORRELATION_ID_KEY, correlationId))
                 .build()));
     return Response
         .seeOther(
@@ -276,7 +282,7 @@ public class ProductRegistryCommandResource {
         try {
           consumer.unsubscribe();
         } catch (PulsarClientException e) {
-          Log.error("Failed to close consumer for product registry events.", e);
+          Log.error(FAILED_TO_CLOSE_CONSUMER_LOG, e);
         }
       });
       // Consume events and emit DTOs
@@ -287,11 +293,11 @@ public class ProductRegistryCommandResource {
             final var msg = Optional.ofNullable(consumer.receive(timeout, TimeUnit.MILLISECONDS));
             if (msg.isEmpty()) {
               // Complete the emitter if no event is received within the timeout. Free up resources.
-              Log.debug("No event received within timeout of " + timeout + " seconds.");
+              Log.debug(NO_EVENT_RECEIVED_LOG[0] + timeout + NO_EVENT_RECEIVED_LOG[1]);
               em.complete();
             }
             final ProductRegistryEvent evt = msg.get().getValue();
-            Log.debug("Received event: " + evt);
+            Log.debug(RECEIVED_EVENT + evt);
             // Map event to DTO
             if (evt instanceof ProductRemoved removed) {
               Log.debug("Emitting DTO for removed event: " + removed);
@@ -299,14 +305,14 @@ public class ProductRegistryCommandResource {
               em.emit(ProductRegistryEventDtoMapper.INSTANCE.toDto(removed));
             } else {
               // Fail the stream on unexpected event types
-              Throwable error = new ProductRegistryEventStreamException("Unexpected event type: " + evt.getClass().getName());
+              Throwable error = new ProductRegistryEventStreamException(UNEXEPECTED_EVENT_TYPE + evt.getClass().getName());
               em.fail(error);
               return;
             }
             // Acknowledge the message
             consumer.acknowledge(msg.get());
           } catch (PulsarClientException e) {
-            Log.error("Failed to receive event from consumer.", e);
+            Log.error(FAILED_TO_RECEIVE_EVENT, e);
             em.fail(e);
             return;
           }
